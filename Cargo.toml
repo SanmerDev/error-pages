@@ -1,0 +1,9 @@
+[package]
+name = "error-pages"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies.actix-web]
+version = "4"
+default-features = false
+features = ["macros"]

@@ -1,0 +1,7 @@
+name: error-pages
+services:
+  error-pages:
+    image: error-pages
+    restart: always
+    ports:
+      - 80:8080
