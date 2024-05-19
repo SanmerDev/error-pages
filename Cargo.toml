@@ -3,7 +3,7 @@ name = "error-pages"
 version = "0.1.0"
 edition = "2021"
 
-[dependencies.actix-web]
-version = "4"
-default-features = false
-features = ["macros"]
+[dependencies]
+actix-web = { version = "4", default-features = false, features = ["macros"] }
+tracing = { version = "0.1", default-features = false, features = ["log"] }
+tracing-subscriber = "0.3"
