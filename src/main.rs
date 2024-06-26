@@ -3,7 +3,7 @@ use std::str::FromStr;
 use actix_web::http::StatusCode;
 use actix_web::{get, middleware, web, App, HttpResponse, HttpServer, Responder};
 
-const TEMPLATE: &'static str = include_str!("../html/template.html");
+const TEMPLATE: &str = include_str!("../html/template.html");
 
 #[get("/{content}")]
 async fn index(content: web::Path<String>) -> impl Responder {
