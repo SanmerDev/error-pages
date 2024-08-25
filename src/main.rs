@@ -43,11 +43,9 @@ async fn main() -> std::io::Result<()> {
         .with_target(false)
         .init();
 
-    tracing::info!("starting HTTP server at http://0.0.0.0:8080");
-
     HttpServer::new(|| {
         App::new()
-            .wrap(middleware::Logger::new("%{r}a %r %s %T %{User-Agent}i"))
+            .wrap(middleware::Logger::default())
             .service(favicon)
             .service(index)
     })
