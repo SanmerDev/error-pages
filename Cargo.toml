@@ -1,10 +1,9 @@
 [package]
 name = "error-pages"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 
 [dependencies]
 actix-web = { version = "4", default-features = false, features = ["macros"] }
-maud = "0.26"
 tracing = { version = "0.1", default-features = false, features = ["log"] }
 tracing-subscriber = "0.3"

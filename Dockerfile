@@ -5,7 +5,8 @@ RUN set -ex \
     && apk add libc-dev \
     && cargo install --path error-pages
 
-FROM --platform=$TARGETPLATFORM alpine AS dist
+FROM alpine AS dist
 COPY --from=builder /usr/local/cargo/bin/error-pages /usr/local/bin/error-pages
+COPY ./asset/ghost-*.ico /etc/error-pages/
 EXPOSE 8080
 ENTRYPOINT ["error-pages"]

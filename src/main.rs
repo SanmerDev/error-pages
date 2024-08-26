@@ -1,39 +1,43 @@
-use std::str::FromStr;
-
 use actix_web::http::StatusCode;
 use actix_web::{get, middleware, web, App, HttpResponse, HttpServer, Responder};
-use maud::{html, Markup, DOCTYPE};
+use std::fs;
+use std::str::FromStr;
 
-#[get("/favicon.ico")]
-async fn favicon() -> impl Responder {
-    HttpResponse::NoContent()
+const TEMPLATE: &str = include_str!("../asset/template.html");
+#[cfg(debug_assertions)]
+const FAVICON_LIGHT: &str = "asset/ghost-light.ico";
+#[cfg(not(debug_assertions))]
+const FAVICON_LIGHT: &str = "/etc/error-pages/ghost-light.ico";
+#[cfg(debug_assertions)]
+const FAVICON_DARK: &str = "asset/ghost-dark.ico";
+#[cfg(not(debug_assertions))]
+const FAVICON_DARK: &str = "/etc/error-pages/ghost-dark.ico";
+
+macro_rules! favicon {
+    ($path:expr) => {
+        match fs::read($path) {
+            Ok(v) => HttpResponse::Ok().content_type("image/x-icon").body(v),
+            Err(_) => HttpResponse::NotFound().finish(),
+        }
+    };
 }
 
-fn style() -> Markup {
-    html! {
-        style {
-            "body { font-family: system-ui; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; padding: 0 20px; background-color: rgb(251, 252, 253); color: rgb(10, 12, 16); text-align: center; word-break: break-all; } \
-             h1 { font-size: 5em; } \
-             @media (prefers-color-scheme: dark) { body { background-color: rgb(10, 12, 16); color: rgb(251, 252, 253); } }"
-        }
-    }
+#[get("/ghost-light.ico")]
+async fn favicon_light() -> impl Responder {
+    favicon!(FAVICON_LIGHT)
+}
+
+#[get("/ghost-dark.ico")]
+async fn favicon_dark() -> impl Responder {
+    favicon!(FAVICON_DARK)
 }
 
 #[get("/{content}")]
 async fn index(content: web::Path<String>) -> impl Responder {
     let content_str = content.into_inner();
     let status_code = StatusCode::from_str(&content_str).unwrap_or(StatusCode::OK);
-
-    let content = html! {
-        (DOCTYPE)
-        meta charset="utf-8";
-        meta name="viewport" content="width=device-width, initial-scale=1.0";
-        (style())
-        title { (content_str) }
-        h1 { (content_str) }
-    };
-
-    HttpResponse::with_body(status_code, content.into_string())
+    let content = TEMPLATE.replace("content-str", &content_str);
+    HttpResponse::with_body(status_code, content)
 }
 
 #[actix_web::main]
@@ -45,9 +49,10 @@ async fn main() -> std::io::Result<()> {
 
     HttpServer::new(|| {
         App::new()
-            .wrap(middleware::Logger::default())
-            .service(favicon)
+            .service(favicon_light)
+            .service(favicon_dark)
             .service(index)
+            .wrap(middleware::Logger::default())
     })
     .bind(("0.0.0.0", 8080))?
     .run()

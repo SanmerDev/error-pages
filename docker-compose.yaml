@@ -1,7 +1,7 @@
 name: error-pages
 services:
   error-pages:
-    image: error-pages
+    image: ghcr.io/sanmerdev/error-pages
     restart: always
     ports:
       - 80:8080
